@@ -34,24 +34,24 @@
     );
 #endif
 
-extern BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered;
-
-VOID
-KmdfExPsCreateThreadNotifyRoutine(
-    _In_ HANDLE ProcessId,
-    _In_ HANDLE ThreadId,
-    _In_ BOOLEAN Create
-);
-
 #if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
-extern BOOLEAN KmdfExPsCreateThreadNotifyRoutineExRegistered;
+    extern BOOLEAN KmdfExPsCreateThreadNotifyRoutineExRegistered;
 
-VOID
-KmdfExPsCreateThreadNotifyRoutineEx(
-    _In_ HANDLE ProcessId,
-    _In_ HANDLE ThreadId,
-    _In_ BOOLEAN Create
-);
+    VOID
+    KmdfExPsCreateThreadNotifyRoutineEx(
+        _In_ HANDLE ProcessId,
+        _In_ HANDLE ThreadId,
+        _In_ BOOLEAN Create
+    );
+#else
+    extern BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered;
+
+    VOID
+        KmdfExPsCreateThreadNotifyRoutine(
+            _In_ HANDLE ProcessId,
+            _In_ HANDLE ThreadId,
+            _In_ BOOLEAN Create
+        );
 #endif
 
 extern BOOLEAN KmdfExPsLoadImageNotifyRoutineRegistered;

@@ -11,9 +11,10 @@ BOOLEAN KmdfExPsCreateProcessEx2NotifyRoutineRegistered = FALSE;
 BOOLEAN KmdfExPsCreateProcessNotifyRoutineRegistered = FALSE;
 BOOLEAN KmdfExPsCreateProcessExNotifyRoutineRegistered = FALSE;
 #endif
-BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered = FALSE;
 #if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
 BOOLEAN KmdfExPsCreateThreadNotifyRoutineExRegistered = FALSE;
+#else
+BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered = FALSE;
 #endif
 BOOLEAN KmdfExPsLoadImageNotifyRoutineRegistered = FALSE;
 

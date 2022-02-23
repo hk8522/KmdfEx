@@ -241,19 +241,19 @@ KmdfExUnregisterAllCallbacks(
     }
 #endif
 
-    if (KmdfExPsCreateThreadNotifyRoutineRegistered == TRUE) {
+#if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
+    if (KmdfExPsCreateThreadNotifyRoutineExRegistered == TRUE) {
         status = PsRemoveCreateThreadNotifyRoutine(
-            KmdfExPsCreateThreadNotifyRoutine);
+            KmdfExPsCreateThreadNotifyRoutineEx);
         // 
         // This should work because we know we registered.
         // 
         ASSERT(NT_SUCCESS(status));
     }
-
-#if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
-    if (KmdfExPsCreateThreadNotifyRoutineExRegistered == TRUE) {
+#else
+    if (KmdfExPsCreateThreadNotifyRoutineRegistered == TRUE) {
         status = PsRemoveCreateThreadNotifyRoutine(
-            KmdfExPsCreateThreadNotifyRoutineEx);
+            KmdfExPsCreateThreadNotifyRoutine);
         // 
         // This should work because we know we registered.
         // 
@@ -329,19 +329,6 @@ void registerCallback()
 
 #endif
 
-    status = PsSetCreateThreadNotifyRoutine(KmdfExPsCreateThreadNotifyRoutine);
-
-    if (!NT_SUCCESS(status)) {
-        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateThreadNotifyRoutine failed! Status 0x%x\n",
-            status);
-        kmdfexLog(buffer);
-        return;
-    }
-
-    kmdfexLog("PsSetCreateThreadNotifyRoutine");
-
-    KmdfExPsCreateThreadNotifyRoutineRegistered = TRUE;
-
 #if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
     status = PsSetCreateThreadNotifyRoutineEx(PsCreateThreadNotifyNonSystem,
         (PVOID)KmdfExPsCreateThreadNotifyRoutineEx);
@@ -356,6 +343,19 @@ void registerCallback()
     kmdfexLog("PsSetCreateThreadNotifyRoutineEx");
 
     KmdfExPsCreateThreadNotifyRoutineExRegistered = TRUE;
+#else
+    status = PsSetCreateThreadNotifyRoutine(KmdfExPsCreateThreadNotifyRoutine);
+
+    if (!NT_SUCCESS(status)) {
+        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateThreadNotifyRoutine failed! Status 0x%x\n",
+            status);
+        kmdfexLog(buffer);
+        return;
+    }
+
+    kmdfexLog("PsSetCreateThreadNotifyRoutine");
+
+    KmdfExPsCreateThreadNotifyRoutineRegistered = TRUE;
 #endif
 
     status = PsSetLoadImageNotifyRoutine(KmdfExPsLoadImageNotifyRoutine);
