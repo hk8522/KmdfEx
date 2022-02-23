@@ -1,0 +1,77 @@
+;
+; kmdfex.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=kmdfex.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+kmdfex_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kmdfex.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%kmdfex.DeviceDesc%=kmdfex_Device, Root\kmdfex ; TODO: edit hw-id
+
+[kmdfex_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+kmdfex.sys
+
+;-------------- Service installation
+[kmdfex_Device.NT.Services]
+AddService = kmdfex,%SPSVCINST_ASSOCSERVICE%, kmdfex_Service_Inst
+
+; -------------- kmdfex driver install sections
+[kmdfex_Service_Inst]
+DisplayName    = %kmdfex.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kmdfex.sys
+
+;
+;--- kmdfex_Device Coinstaller installation ------
+;
+
+[kmdfex_Device.NT.CoInstallers]
+AddReg=kmdfex_Device_CoInstaller_AddReg
+CopyFiles=kmdfex_Device_CoInstaller_CopyFiles
+
+[kmdfex_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[kmdfex_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[kmdfex_Device.NT.Wdf]
+KmdfService =  kmdfex, kmdfex_wdfsect
+[kmdfex_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "kmdfex Installation Disk"
+kmdfex.DeviceDesc = "kmdfex Device"
+kmdfex.SVCDESC = "kmdfex Service"
