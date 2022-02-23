@@ -5,16 +5,17 @@
 #endif
 
 
-BOOLEAN KmdfExPsCreateProcessNotifyRoutineRegistered;
-BOOLEAN KmdfExPsCreateProcessExNotifyRoutineRegistered;
 #if (NTDDI_VERSION >= NTDDI_WIN10_RS2)
-BOOLEAN KmdfExPsCreateProcessEx2NotifyRoutineRegistered;
+BOOLEAN KmdfExPsCreateProcessEx2NotifyRoutineRegistered = FALSE;
+#else
+BOOLEAN KmdfExPsCreateProcessNotifyRoutineRegistered = FALSE;
+BOOLEAN KmdfExPsCreateProcessExNotifyRoutineRegistered = FALSE;
 #endif
-BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered;
+BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered = FALSE;
 #if (NTDDI_VERSION >= NTDDI_WINTHRESHOLD)
-BOOLEAN KmdfExPsCreateThreadNotifyRoutineExRegistered;
+BOOLEAN KmdfExPsCreateThreadNotifyRoutineExRegistered = FALSE;
 #endif
-BOOLEAN KmdfExPsLoadImageNotifyRoutineRegistered;
+BOOLEAN KmdfExPsLoadImageNotifyRoutineRegistered = FALSE;
 
 VOID
 KmdfExPsCreateProcessNotifyRoutine(

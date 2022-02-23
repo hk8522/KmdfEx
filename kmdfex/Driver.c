@@ -208,7 +208,18 @@ KmdfExUnregisterAllCallbacks(
 
     NTSTATUS status;
 
-#if (NTDDI_VERSION < NTDDI_VISTA)
+#if (NTDDI_VERSION >= NTDDI_WIN10_RS2) 
+    if (KmdfExPsCreateProcessEx2NotifyRoutineRegistered == TRUE) {
+        status = PsSetCreateProcessNotifyRoutineEx2(
+            PsCreateProcessNotifySubsystems,
+            (PVOID)KmdfExPsCreateProcessNotifyRoutineEx2,
+            TRUE);
+        // 
+        // This should work because we know we registered.
+        // 
+        ASSERT(NT_SUCCESS(status));
+    }
+#elif (NTDDI_VERSION < NTDDI_VISTA)
     if (KmdfExPsCreateProcessNotifyRoutineRegistered == TRUE) {
         status = PsSetCreateProcessNotifyRoutine(
             KmdfExPsCreateProcessNotifyRoutine,
@@ -222,19 +233,6 @@ KmdfExUnregisterAllCallbacks(
     if (KmdfExPsCreateProcessExNotifyRoutineRegistered == TRUE) {
         status = PsSetCreateProcessNotifyRoutineEx(
             KmdfExPsCreateProcessNotifyRoutineEx,
-            TRUE);
-        // 
-        // This should work because we know we registered.
-        // 
-        ASSERT(NT_SUCCESS(status));
-    }
-#endif
-
-#if (NTDDI_VERSION >= NTDDI_WIN10_RS2) 
-    if (KmdfExPsCreateProcessExNotifyRoutineRegistered == TRUE) {
-        status = PsSetCreateProcessNotifyRoutineEx2(
-            PsCreateProcessNotifySubsystems,
-            (PVOID)KmdfExPsCreateProcessNotifyRoutineEx2,
             TRUE);
         // 
         // This should work because we know we registered.
@@ -283,39 +281,6 @@ void registerCallback()
     // 
     // PS CALLBACKS 
     // 
-//#if (NTDDI_VERSION < NTDDI_VISTA)
-//
-//    status = PsSetCreateProcessNotifyRoutine(KmdfExPsCreateProcessNotifyRoutine,
-//        FALSE);
-//
-//    if (!NT_SUCCESS(status)) {
-//        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateProcessNotifyRoutine failed! Status 0x%x\n",
-//            status);
-//        kmdfexLog(buffer);
-//        goto Exit;
-//    }
-//
-//    KmdfExPsCreateProcessNotifyRoutineRegistered = TRUE;
-//
-//#else
-//
-//    status = PsSetCreateProcessNotifyRoutineEx(
-//        KmdfExPsCreateProcessNotifyRoutineEx,
-//        FALSE);
-//
-//    if (!NT_SUCCESS(status)) {
-//        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateProcessNotifyRoutineEx failed! Status 0x%x\n",
-//            status);
-//        kmdfexLog(buffer);
-//        return;
-//    }
-//
-//    kmdfexLog("PsSetCreateProcessNotifyRoutineEx");
-//
-//    KmdfExPsCreateProcessExNotifyRoutineRegistered = TRUE;
-//
-//#endif
-
 #if (NTDDI_VERSION >= NTDDI_WIN10_RS2)
     status = PsSetCreateProcessNotifyRoutineEx2(PsCreateProcessNotifySubsystems,
         (PVOID)KmdfExPsCreateProcessNotifyRoutineEx2,
@@ -331,8 +296,38 @@ void registerCallback()
     kmdfexLog("PsSetCreateProcessNotifyRoutineEx2");
 
     KmdfExPsCreateProcessEx2NotifyRoutineRegistered = TRUE;
-#endif
+#elif (NTDDI_VERSION < NTDDI_VISTA)
 
+    status = PsSetCreateProcessNotifyRoutine(KmdfExPsCreateProcessNotifyRoutine,
+        FALSE);
+
+    if (!NT_SUCCESS(status)) {
+        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateProcessNotifyRoutine failed! Status 0x%x\n",
+            status);
+        kmdfexLog(buffer);
+        goto Exit;
+    }
+
+    KmdfExPsCreateProcessNotifyRoutineRegistered = TRUE;
+
+#else
+
+    status = PsSetCreateProcessNotifyRoutineEx(
+        KmdfExPsCreateProcessNotifyRoutineEx,
+        FALSE);
+
+    if (!NT_SUCCESS(status)) {
+        RtlStringCbPrintfA(buffer, sizeof(buffer), "PsSetCreateProcessNotifyRoutineEx failed! Status 0x%x\n",
+            status);
+        kmdfexLog(buffer);
+        return;
+    }
+
+    kmdfexLog("PsSetCreateProcessNotifyRoutineEx");
+
+    KmdfExPsCreateProcessExNotifyRoutineRegistered = TRUE;
+
+#endif
 
     status = PsSetCreateThreadNotifyRoutine(KmdfExPsCreateThreadNotifyRoutine);
 

@@ -5,37 +5,33 @@
 /////////////////////
 
 
-extern BOOLEAN KmdfExPsCreateProcessNotifyRoutineRegistered;
-
-VOID
-KmdfExPsCreateProcessNotifyRoutine(
-    _In_ HANDLE ParentId,
-    _In_ HANDLE ProcessId,
-    _In_ BOOLEAN Create
-);
-
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-
-extern BOOLEAN KmdfExPsCreateProcessExNotifyRoutineRegistered;
-
-VOID
-KmdfExPsCreateProcessNotifyRoutineEx(
-    _Inout_ PEPROCESS Process,
-    _In_ HANDLE ProcessId,
-    _In_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
-);
-#endif
-
 #if (NTDDI_VERSION >= NTDDI_WIN10_RS2)
+    extern BOOLEAN KmdfExPsCreateProcessEx2NotifyRoutineRegistered;
 
-extern BOOLEAN KmdfExPsCreateProcessEx2NotifyRoutineRegistered;
+    VOID
+    KmdfExPsCreateProcessNotifyRoutineEx2(
+        _Inout_ PEPROCESS Process,
+        _In_ HANDLE ProcessId,
+        _In_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
+    );
+#elif (NTDDI_VERSION < NTDDI_VISTA)
+    extern BOOLEAN KmdfExPsCreateProcessNotifyRoutineRegistered;
 
-VOID
-KmdfExPsCreateProcessNotifyRoutineEx2(
-    _Inout_ PEPROCESS Process,
-    _In_ HANDLE ProcessId,
-    _In_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
-);
+    VOID
+    KmdfExPsCreateProcessNotifyRoutine(
+        _In_ HANDLE ParentId,
+        _In_ HANDLE ProcessId,
+        _In_ BOOLEAN Create
+    );
+#else
+    extern BOOLEAN KmdfExPsCreateProcessExNotifyRoutineRegistered;
+
+    VOID
+    KmdfExPsCreateProcessNotifyRoutineEx(
+        _Inout_ PEPROCESS Process,
+        _In_ HANDLE ProcessId,
+        _In_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
+    );
 #endif
 
 extern BOOLEAN KmdfExPsCreateThreadNotifyRoutineRegistered;
